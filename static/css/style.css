@@ -21,6 +21,7 @@
 
   --success: #1B7448;  /* --primary-soft zemininde >= 4.5:1 */
   --error:   #B42318;
+  --selected: #D4182B;  /* seçili oy seçeneği: beyaza >= 5:1, pastel kartlara >= 4:1 */
   --radius:  16px;
   --shadow:  0 4px 16px rgba(31, 35, 64, 0.08);
 }
@@ -437,8 +438,9 @@ input::placeholder {
 }
 
 .option-card label {
+  position: relative;
   display: block;
-  padding: 1rem 1.25rem;
+  padding: 1rem 3.25rem 1rem 1.25rem;  /* sağda seçili işareti için boşluk */
   border: 2px solid var(--border-strong);
   border-radius: var(--radius);
   color: var(--text);
@@ -451,13 +453,38 @@ input::placeholder {
 .opt-4 label { background: var(--opt-4); }
 .opt-5 label { background: var(--opt-5); }
 
+/* Seçili seçenek: parlak kırmızı kalın çerçeve + kalın yazı + ✓ işareti.
+   Durum yalnızca renkle değil, işaret ve yazı ağırlığıyla da anlaşılır (WCAG 1.4.1). */
 .option-card input:checked + label {
-  border-color: var(--primary);
+  border-color: var(--selected);
+  box-shadow: 0 0 0 2px var(--selected);
+  font-weight: 800;
+}
+
+.option-card input:checked + label::after {
+  content: "✓";
+  position: absolute;
+  right: 0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background: var(--selected);
+  color: #FFFFFF;
+  font-weight: 800;
 }
 
 .option-card input:focus-visible + label {
   outline: 3px solid var(--primary);
   outline-offset: 2px;
+}
+
+/* Seçili kartın kalın çerçevesiyle odak halkası çakışmasın. */
+.option-card input:checked:focus-visible + label {
+  outline-offset: 5px;
 }
 
 fieldset:disabled .option-card input,
