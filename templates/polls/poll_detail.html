@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load poll_extras %}
+
+{% block title %}{{ poll.question }} · Kararsızım{% endblock %}
+{% block meta_description %}{{ poll.question }} — Kararsızım'da bu ankete oy ver.{% endblock %}
+
+{% block content %}
+<article class="card">
+  <h1 class="poll-question">{{ poll.question }}</h1>
+  <p class="poll-meta">
+    <span>@{{ poll.author.username }}</span>
+    <time datetime="{{ poll.created_at|date:'c' }}">{{ poll.created_at|since }}</time>
+  </p>
+
+  {# Faz 4'te bu form oy gönderecek. Radio değeri seçeneğin id'si değil, `order` değeridir. #}
+  <form class="vote-form">
+    <fieldset disabled>
+      <legend class="visually-hidden">Seçenekler</legend>
+      {% for option in poll.options.all %}
+      <div class="option-card opt-{{ forloop.counter }}">
+        <input type="radio" name="option" id="option-{{ option.order }}" value="{{ option.order }}">
+        <label for="option-{{ option.order }}">{{ option.text }}</label>
+      </div>
+      {% endfor %}
+    </fieldset>
+    <button type="button" class="btn btn--primary btn--block" disabled>Oyumu Ver</button>
+    <p class="muted form-footer">Oylama çok yakında açılıyor.</p>
+  </form>
+</article>
+
+<p><a href="{% url 'polls:list' %}">← Tüm anketler</a></p>
+{% endblock %}

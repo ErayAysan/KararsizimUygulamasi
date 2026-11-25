@@ -4,7 +4,7 @@
     <ul class="navbar__links">
       {% if user.is_authenticated %}
         <li class="navbar__user">@{{ user.username }}</li>
-        {# "Anket Oluştur" butonu Faz 3'te eklenecek. #}
+        <li><a class="btn btn--primary" href="{% url 'polls:create' %}">Anket Oluştur</a></li>
         <li>
           <form method="post" action="{% url 'accounts:logout' %}">
             {% csrf_token %}

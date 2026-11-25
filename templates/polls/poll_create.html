@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Yeni Anket · Kararsızım{% endblock %}
+
+{% block content %}
+<section class="card">
+  <h1>Yeni anket ✨</h1>
+  <p class="muted">Kararsız kaldığın konuyu yaz, 2 ile 5 arasında seçenek ekle.</p>
+
+  <form method="post">
+    {% csrf_token %}
+
+    {% with field=form.question %}
+      {% include "partials/form_field.html" %}
+    {% endwith %}
+
+    <fieldset class="options" data-option-list>
+      <legend>Seçenekler <span class="muted">(en az 2, en fazla 5)</span></legend>
+
+      {% if form.non_field_errors %}
+      <ul class="field__errors" role="alert">
+        {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+      </ul>
+      {% endif %}
+
+      {% for opt in form.option_fields %}
+      <div class="option-row" data-option-row>
+        <label for="{{ opt.id }}" data-option-label>Seçenek {{ forloop.counter }}</label>
+        <div class="option-row__control">
+          <input type="text" name="option" id="{{ opt.id }}" value="{{ opt.value }}" maxlength="100" {% if opt.required %}required{% endif %}>
+          <button type="button" class="btn btn--icon" data-remove-option hidden aria-label="Seçenek {{ forloop.counter }} alanını sil">✕</button>
+        </div>
+      </div>
+      {% endfor %}
+
+      <button type="button" class="btn btn--soft" data-add-option hidden>➕ Seçenek ekle</button>
+    </fieldset>
+
+    <button type="submit" class="btn btn--primary btn--block">Anketi yayınla</button>
+  </form>
+</section>
+{% endblock %}
