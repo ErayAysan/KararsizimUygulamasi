@@ -104,6 +104,128 @@ a:hover {
   text-decoration: none;
 }
 
+.navbar__links {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar__links form {
+  margin: 0;
+}
+
+.navbar__user {
+  font-weight: 600;
+  padding-inline: 0.5rem;
+}
+
+/* Butonlar */
+.btn {
+  display: inline-block;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  text-align: center;
+  cursor: pointer;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  padding: 0.5rem 1.1rem;
+  line-height: 1.4;
+}
+
+.btn--primary {
+  background: var(--primary);
+  color: #FFFFFF;
+}
+
+.btn--primary:hover {
+  background: var(--primary-hover);
+  color: #FFFFFF;
+}
+
+.btn--link {
+  background: transparent;
+  color: var(--primary);
+}
+
+.btn--link:hover {
+  background: var(--primary-soft);
+  color: var(--primary-hover);
+}
+
+.btn--block {
+  display: block;
+  width: 100%;
+  margin-top: 1rem;
+  padding-block: 0.7rem;
+}
+
+/* Formlar */
+.card--narrow {
+  max-width: 460px;
+  margin-inline: auto;
+}
+
+.field {
+  margin-bottom: 1rem;
+}
+
+.field label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.field input[type="text"],
+.field input[type="email"],
+.field input[type="password"] {
+  width: 100%;
+  font: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 0.6rem 0.8rem;
+}
+
+.field input:focus-visible {
+  border-color: var(--primary);
+  outline: 3px solid var(--primary-soft);
+  outline-offset: 0;
+}
+
+.field--error input {
+  border-color: var(--error);
+}
+
+.field__help {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.field__help ul {
+  margin: 0.25rem 0 0;
+  padding-left: 1.2rem;
+}
+
+.field__errors {
+  color: var(--error);
+  font-size: 0.9rem;
+  font-weight: 600;
+  list-style: none;
+  margin: 0.25rem 0 0;
+  padding: 0;
+}
+
+.form-footer {
+  text-align: center;
+  margin: 1.25rem 0 0;
+}
+
 /* Mesajlar */
 .messages {
   list-style: none;

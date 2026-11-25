@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Kayıt Ol · Kararsızım{% endblock %}
+
+{% block content %}
+<section class="card card--narrow">
+  <h1>Kayıt Ol ✨</h1>
+  <p class="muted">Anket açmak için üye ol. Oy vermek için üyelik gerekmez.</p>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+    {% if form.non_field_errors %}
+    <ul class="field__errors" role="alert">
+      {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+    </ul>
+    {% endif %}
+    {% for field in form %}
+      {% include "partials/form_field.html" %}
+    {% endfor %}
+    <button type="submit" class="btn btn--primary btn--block">Kayıt Ol</button>
+  </form>
+
+  <p class="muted form-footer">Zaten üye misin? <a href="{% url 'accounts:login' %}{% if next %}?next={{ next|urlencode }}{% endif %}">Giriş yap</a></p>
+</section>
+{% endblock %}
