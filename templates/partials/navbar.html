@@ -1,6 +1,20 @@
 <header class="navbar">
   <nav class="navbar__inner container" aria-label="Ana gezinme">
     <a class="navbar__brand" href="{% url 'polls:list' %}">Kararsızım 🤔</a>
-    {# Giriş / kayıt / anket oluştur bağlantıları Faz 2 ve Faz 3'te eklenecek. #}
+    <ul class="navbar__links">
+      {% if user.is_authenticated %}
+        <li class="navbar__user">@{{ user.username }}</li>
+        {# "Anket Oluştur" butonu Faz 3'te eklenecek. #}
+        <li>
+          <form method="post" action="{% url 'accounts:logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn--link">Çıkış</button>
+          </form>
+        </li>
+      {% else %}
+        <li><a class="btn btn--link" href="{% url 'accounts:login' %}">Giriş Yap</a></li>
+        <li><a class="btn btn--primary" href="{% url 'accounts:register' %}">Kayıt Ol</a></li>
+      {% endif %}
+    </ul>
   </nav>
 </header>
