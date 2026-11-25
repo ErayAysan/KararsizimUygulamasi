@@ -1,24 +1,103 @@
 from django.contrib import messages
 from django.contrib.auth.views import redirect_to_login
 from django.core.paginator import Paginator
+from django.db import IntegrityError, transaction
 from django.db.models import Count
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
 
 from .forms import PollForm
-from .models import Poll
+from .models import Poll, Vote
 
 POLLS_PER_PAGE = 10
 
 
+def _voter(request):
+    """Oy veren kişiyi tanımlar: üye ise kullanıcı, misafir ise imzalı çerezdeki UUID."""
+    if request.user.is_authenticated:
+        return {"user": request.user}
+    return {"voter_token": request.voter_token}
+
+
 def poll_list(request):
-    polls = Poll.objects.select_related("author").annotate(option_count=Count("options")).order_by("-created_at")
+    polls = (
+        Poll.objects.select_related("author")
+        # İki ayrı ilişki aynı sorguda sayıldığı için distinct şart (aksi hâlde çarpılırlar).
+        .annotate(option_count=Count("options", distinct=True), vote_count=Count("votes", distinct=True))
+        .order_by("-created_at")
+    )
     page = Paginator(polls, POLLS_PER_PAGE).get_page(request.GET.get("page"))
     return render(request, "polls/poll_list.html", {"page": page})
 
 
+def _percent(count, total):
+    """Tam sayıya yarıdan yukarı yuvarlanmış yüzde (Python'un banker yuvarlamasından kaçınır)."""
+    return (count * 100 + total // 2) // total if total else 0
+
+
 def poll_detail(request, public_id):
-    poll = get_object_or_404(Poll.objects.select_related("author").prefetch_related("options"), public_id=public_id)
-    return render(request, "polls/poll_detail.html", {"poll": poll})
+    poll = get_object_or_404(Poll.objects.select_related("author"), public_id=public_id)
+
+    options = list(poll.options.annotate(vote_count=Count("votes")))  # Meta.ordering: order
+    total_votes = sum(option.vote_count for option in options)
+
+    my_order = (
+        Vote.objects.filter(poll=poll, **_voter(request)).values_list("option__order", flat=True).first()
+    )
+    is_author = request.user.is_authenticated and poll.author_id == request.user.id
+
+    # Sonuçlar yalnızca oy vermiş kişiye ve anket sahibine gösterilir (sonuçlar oyları etkilemesin).
+    show_results = my_order is not None or is_author
+    top = max((option.vote_count for option in options), default=0)
+    for option in options:
+        option.percent = _percent(option.vote_count, total_votes)
+        option.is_mine = option.order == my_order
+        option.is_winner = top > 0 and option.vote_count == top
+
+    context = {
+        "poll": poll,
+        "options": options,
+        "total_votes": total_votes,
+        "show_results": show_results,
+        "can_vote": my_order is None,
+    }
+    return render(request, "polls/poll_detail.html", context)
+
+
+@require_POST
+def vote(request, public_id):
+    poll = get_object_or_404(Poll, public_id=public_id)
+
+    # Çerezler kapalıysa her istekte yeni kimlik üretilir; bu, sınırsız oya yol açar. Reddet.
+    if not request.user.is_authenticated and request.voter_token_is_new:
+        messages.error(request, "Oy verebilmek için tarayıcında çerezlere izin vermelisin.")
+        return redirect(poll)
+
+    # Seçenek, sayısal id ile değil `order` değeriyle bulunur; yalnızca bu anketin seçenekleri aranır.
+    try:
+        order = int(request.POST.get("option", ""))
+    except ValueError:
+        order = None
+    option = poll.options.filter(order=order).first() if order is not None else None
+    if option is None:
+        messages.error(request, "Lütfen bir seçenek seç.")
+        return redirect(poll)
+
+    voter = _voter(request)
+    if Vote.objects.filter(poll=poll, **voter).exists():
+        messages.warning(request, "Bu ankete zaten oy verdin.")
+        return redirect(poll)
+
+    try:
+        with transaction.atomic():
+            Vote.objects.create(poll=poll, option=option, **voter)
+    except IntegrityError:
+        # Aynı anda gelen ikinci istek: veritabanı kısıtı ikinci oyu engeller.
+        messages.warning(request, "Bu ankete zaten oy verdin.")
+        return redirect(poll)
+
+    messages.success(request, "Oyun kaydedildi! 🎉")
+    return redirect(poll)
 
 
 def poll_create(request):
