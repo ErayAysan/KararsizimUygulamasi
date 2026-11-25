@@ -3,7 +3,8 @@
   --surface:       #FFFFFF;
   --text:          #1F2340;
   --text-muted:    #545A75;
-  --border:        #ECE4F7;
+  --border:        #ECE4F7;  /* dekoratif kenarlıklar (kart çerçevesi vb.) */
+  --border-strong: #7A7F99;  /* form alanı ve seçenek kenarlıkları: beyaza karşı >= 3:1 (WCAG 1.4.11) */
 
   --primary:       #5B3FD9;
   --primary-hover: #4A30BF;
@@ -18,7 +19,7 @@
   --opt-4: #FFF3B8;
   --opt-5: #EADCFF;
 
-  --success: #1E7F4F;
+  --success: #1B7448;  /* --primary-soft zemininde >= 4.5:1 */
   --error:   #B42318;
   --radius:  16px;
   --shadow:  0 4px 16px rgba(31, 35, 64, 0.08);
@@ -215,20 +216,27 @@ a:hover {
 
 .field input[type="text"],
 .field input[type="email"],
-.field input[type="password"] {
+.field input[type="password"],
+.option-row input[type="text"] {
   width: 100%;
   font: inherit;
   color: var(--text);
   background: var(--surface);
-  border: 2px solid var(--border);
+  border: 2px solid var(--border-strong);
   border-radius: 12px;
   padding: 0.6rem 0.8rem;
 }
 
-.field input:focus-visible {
+.field input:focus-visible,
+.option-row input[type="text"]:focus-visible {
   border-color: var(--primary);
-  outline: 3px solid var(--primary-soft);
-  outline-offset: 0;
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+input::placeholder {
+  color: var(--text-muted);
+  opacity: 1;
 }
 
 .field--error input {
@@ -312,7 +320,7 @@ a:hover {
 .btn--icon {
   background: transparent;
   color: var(--text-muted);
-  border-color: var(--border);
+  border-color: var(--border-strong);
   padding: 0.35rem 0.7rem;
 }
 
@@ -431,7 +439,7 @@ a:hover {
 .option-card label {
   display: block;
   padding: 1rem 1.25rem;
-  border: 2px solid transparent;
+  border: 2px solid var(--border-strong);
   border-radius: var(--radius);
   color: var(--text);
   font-weight: 600;
@@ -480,22 +488,8 @@ fieldset:disabled .option-card label {
   gap: 0.5rem;
 }
 
-.option-row input[type="text"],
-.field input[type="text"] {
+.option-row input[type="text"] {
   flex: 1;
-  width: 100%;
-  font: inherit;
-  color: var(--text);
-  background: var(--surface);
-  border: 2px solid var(--border);
-  border-radius: 12px;
-  padding: 0.6rem 0.8rem;
-}
-
-.option-row input[type="text"]:focus-visible {
-  border-color: var(--primary);
-  outline: 3px solid var(--primary-soft);
-  outline-offset: 0;
 }
 
 .options > .btn {
@@ -581,4 +575,85 @@ fieldset:disabled .option-card label {
   margin: 1.25rem 0 0;
   color: var(--text-muted);
   text-align: center;
+}
+
+/* ---------- Faz 5: cila ve erişilebilirlik ---------- */
+
+.skip-link {
+  position: absolute;
+  left: 0.5rem;
+  top: -4rem;
+  z-index: 10;
+  background: var(--primary);
+  color: #FFFFFF;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 999px;
+  padding: 0.5rem 1rem;
+}
+
+.skip-link:focus {
+  top: 0.5rem;
+}
+
+/* Atlama bağlantısının hedefi etkileşimli bir öğe değil; odak halkası gerekmez. */
+main:focus {
+  outline: none;
+}
+
+a {
+  text-underline-offset: 0.15em;
+}
+
+.navbar__brand:hover {
+  color: var(--primary);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn--primary:focus-visible,
+.btn--soft:focus-visible {
+  outline-offset: 3px;
+}
+
+.poll-card,
+.btn,
+.option-card label {
+  transition: box-shadow 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+@media (hover: hover) {
+  .poll-card:hover {
+    box-shadow: 0 8px 24px rgba(31, 35, 64, 0.14);
+    transform: translateY(-2px);
+  }
+
+  .option-card:hover input:not(:checked):not(:disabled) + label {
+    border-color: var(--primary);
+  }
+}
+
+/* Sonuç çubukları soldan sağa dolar (yalnızca CSS; hareket azaltma tercihi aşağıda kapatır). */
+@keyframes bar-fill {
+  from { width: 0; }
+}
+
+.result__fill {
+  animation: bar-fill 0.9s ease-out;
+}
+
+/* Gönderilirken butonlar pasifleşir (çift gönderim engeli; bkz. main.js). */
+.btn[aria-busy="true"] {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+.empty-state__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 1rem 0 0;
 }
