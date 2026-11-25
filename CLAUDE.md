@@ -32,6 +32,8 @@ Lint/format aracı yok; ekleme. Ek paket eklemeden önce gerçekten gerekli mi d
 - **Statik dosyalar:** `static/` kaynak, `staticfiles/` üretilen çıktı (gitignore'da). WhiteNoise `CompressedManifestStaticFilesStorage` + `WHITENOISE_MANIFEST_STRICT=False` (manifest yokken testler kırılmasın). Vercel `manage.py`'yi bulup Django'yu otomatik algılar ve `collectstatic`'i kendisi çalıştırır; **`vercel.json` gerekmiyor**. Python sürümü `.python-version` ile 3.14'e sabit (Vercel 3.12/3.13/3.14 destekliyor, 3.15 yok).
 - **Frontend:** Django template + saf HTML/CSS/JS; CSS framework'ü yok. Renkler `static/css/style.css`'teki `:root` değişkenleri (WCAG AA zorunlu, PLAN.md 7.3). Formlar JS kapalıyken de çalışmalı.
 
+- **BOM tuzağı:** Windows PowerShell 5.1'de `Set-Content/Out-File -Encoding utf8` dosyanın başına BOM ekler. `requirements.txt` bu yüzden Vercel build'ini kırdı (`PYTHON_REQUIREMENTS_PARSE_ERROR`), `.env`'de de ilk anahtarı bozar. `requirements.txt`/`.env` gibi dosyaları BOM'suz yaz (Write/Edit aracı ya da `[IO.File]::WriteAllText(..., (New-Object Text.UTF8Encoding $false))`).
+
 ## Proje kuralları
 
 - Arayüz Türkçe, kod (değişken, model, dosya adları) İngilizce; `LANGUAGE_CODE="tr"`, `TIME_ZONE="Europe/Istanbul"`.
