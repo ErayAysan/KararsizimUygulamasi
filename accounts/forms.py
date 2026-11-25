@@ -3,6 +3,8 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 
 from .models import User
 
+EMAIL_MAX_LENGTH = User._meta.get_field("email").max_length  # 254
+
 
 class RegisterForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
@@ -41,6 +43,10 @@ class LoginForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("label_suffix", "")
         super().__init__(*args, **kwargs)
+        # AuthenticationForm, `username` alanının uzunluğunu kullanıcı adı modelinden (20) alır.
+        # Burada alan bir e-posta olduğu için sınır EmailField'ın standart uzunluğu olmalı.
+        self.fields["username"].max_length = EMAIL_MAX_LENGTH
+        self.fields["username"].widget.attrs["maxlength"] = EMAIL_MAX_LENGTH
 
     error_messages = {
         "invalid_login":"E-posta veya şifre hatalı. Lütfen tekrar dene.",
