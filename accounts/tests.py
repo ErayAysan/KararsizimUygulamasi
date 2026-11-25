@@ -1,3 +1,4 @@
+import re
 from django.urls import reverse
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
@@ -204,3 +205,24 @@ class AdminTests(TestCase):
 
     def test_admin_login_page_is_styled(self):
         self.assertEqual(self.client.get("/admin/login/").status_code, 200)
+
+
+class EmailFieldLengthTests(TestCase):
+    """Uzun e-postalar giriş ve kayıt formlarına sığmalı (maxlength kısıtı olmamalı)."""
+
+    LONG_EMAIL = "bir.cok.uzun.bir.kullanici.adi@ornek-alan-adi.example.com"  # 56 karakter
+
+    def test_login_email_input_has_no_short_maxlength(self):
+        html = self.client.get(reverse("accounts:login")).content.decode()
+        tag = re.search(r"<input[^>]*name=\"username\"[^>]*>", html).group(0)
+        self.assertEqual(re.search(r"maxlength=\"(\d+)\"", tag).group(1), "254")
+
+    def test_register_email_input_allows_long_addresses(self):
+        html = self.client.get(reverse("accounts:register")).content.decode()
+        tag = re.search(r"<input[^>]*name=\"email\"[^>]*>", html).group(0)
+        self.assertGreaterEqual(int(re.search(r"maxlength=\"(\d+)\"", tag).group(1)), len(self.LONG_EMAIL))
+
+    def test_user_with_a_long_email_can_log_in(self):
+        User.objects.create_user("uzunmail", self.LONG_EMAIL, PASSWORD)
+        response = self.client.post(reverse("accounts:login"), {"username": self.LONG_EMAIL, "password": PASSWORD})
+        self.assertRedirects(response, reverse("polls:list"))
