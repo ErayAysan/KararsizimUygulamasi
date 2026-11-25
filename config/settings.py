@@ -95,6 +95,8 @@ if DATABASE_URL:
     # Supabase transaction pooler (port 6543) sunucu taraflı imleçleri desteklemez.
     DATABASES["default"]["DISABLE_SERVER_SIDE_CURSORS"] = True
     DATABASES["default"]["CONN_MAX_AGE"] = 0
+    # Transaction pooler'da hazır ifadeler (prepared statements) bağlantılar arasında paylaşılamaz.
+    DATABASES["default"].setdefault("OPTIONS", {})["prepare_threshold"] = None
 else:
     DATABASES = {
         "default": {
