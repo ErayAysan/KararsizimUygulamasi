@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}Kararsızım 🤔 · Anketler{% endblock %}
+{% block title %}{% if page.number > 1 %}Anketler · Sayfa {{ page.number }} · Kararsızım{% else %}Kararsızım 🤔 · Kararsız kaldığın konuda danış{% endif %}{% endblock %}
+{% block meta_description %}Kararsız kaldığın konuda diğer kullanıcılara danış. Anketlere üye olmadan oy ver, anket açmak için üye ol.{% endblock %}
 
 {% block content %}
 <div class="page-header">

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Sayfa bulunamadı · Kararsızım{% endblock %}
+{% block meta_description %}Aradığın sayfa bulunamadı.{% endblock %}
+
+{% block content %}
+<section class="card empty-state">
+  <p class="empty-state__emoji" aria-hidden="true">🧭</p>
+  <h1>Bu sayfayı bulamadık</h1>
+  <p class="muted">Adres yanlış yazılmış ya da anket artık yok olabilir. Kararsız kalma, ana sayfadan devam et!</p>
+  <p class="empty-state__actions">
+    <a class="btn btn--primary" href="{% url 'polls:list' %}">Ana sayfaya dön</a>
+    <a class="btn btn--soft" href="{% url 'polls:create' %}">➕ Yeni anket aç</a>
+  </p>
+</section>
+{% endblock %}

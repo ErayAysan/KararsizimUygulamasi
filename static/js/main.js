@@ -57,3 +57,44 @@
 
   refresh();
 })();
+
+// Çift gönderim engeli: POST formları gönderilirken butonlar pasifleşir; ikinci gönderim yok sayılır.
+// Tarayıcı sayfayı geri/ileri önbelleğinden açarsa (pageshow) butonlar yeniden etkinleşir.
+(function () {
+  var BUSY_LABEL = "Gönderiliyor…";
+
+  function release(form) {
+    form.removeAttribute("data-submitting");
+    Array.prototype.forEach.call(form.querySelectorAll("button[type=submit]"), function (button) {
+      button.disabled = false;
+      button.removeAttribute("aria-busy");
+      if (button.dataset.label) button.textContent = button.dataset.label;
+    });
+  }
+
+  document.addEventListener("submit", function (event) {
+    var form = event.target;
+    if (!form.matches || !form.matches("form[method=post]")) return;
+
+    if (form.hasAttribute("data-submitting")) {
+      event.preventDefault();
+      return;
+    }
+    form.setAttribute("data-submitting", "");
+
+    // Pasifleştirme, gönderim başladıktan sonra yapılır; böylece form verisi etkilenmez.
+    window.setTimeout(function () {
+      Array.prototype.forEach.call(form.querySelectorAll("button[type=submit]"), function (button) {
+        button.dataset.label = button.textContent;
+        button.disabled = true;
+        button.setAttribute("aria-busy", "true");
+        if (button.classList.contains("btn--block")) button.textContent = BUSY_LABEL;
+      });
+    }, 0);
+  });
+
+  window.addEventListener("pageshow", function (event) {
+    if (!event.persisted) return;
+    Array.prototype.forEach.call(document.querySelectorAll("form[data-submitting]"), release);
+  });
+})();
