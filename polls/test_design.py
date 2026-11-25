@@ -42,6 +42,7 @@ TEXT_PAIRS = [
     ("white", "primary"), ("white", "primary-hover"),
     ("primary", "bg"), ("primary", "surface"), ("primary", "primary-soft"),
     ("primary-hover", "primary-soft"), ("primary-hover", "border"),
+    ("white", "selected"),  # seçili seçenekteki ✓ işareti
     ("success", "primary-soft"), ("success", "bg"), ("success", "surface"),
     ("error", "surface"), ("error", "primary-soft"), ("error", "bg"),
 ] + [("text", option) for option in OPTIONS]
@@ -51,7 +52,10 @@ UI_PAIRS = [
     ("border-strong", "surface"), ("border-strong", "bg"),
     ("text-muted", "surface"),  # sonuç çubuğu kenarlığı
     ("primary", "surface"), ("primary", "bg"),  # odak halkası, seçili kenarlık
-] + [("border-strong", option) for option in OPTIONS] + [("primary", option) for option in OPTIONS]
+] + [("border-strong", option) for option in OPTIONS] + [("primary", option) for option in OPTIONS] + [
+    # Seçili oy seçeneğinin kırmızı çerçevesi: kartın içine (pastel) ve dışına (beyaz) karşı belirgin olmalı.
+    ("selected", "surface"), ("selected", "bg"),
+] + [("selected", option) for option in OPTIONS]
 
 
 class ContrastTests(SimpleTestCase):
@@ -73,6 +77,24 @@ class ContrastTests(SimpleTestCase):
         for fg, bg in UI_PAIRS:
             ratio = contrast(self.palette[fg], self.palette[bg])
             self.assertGreaterEqual(ratio, 3.0, f"{fg} / {bg} = {ratio:.2f}")
+
+    def test_selected_option_is_marked_by_color_and_a_checkmark(self):
+        css = CSS_PATH.read_text(encoding="utf-8")
+        checked = re.search(r"\.option-card input:checked \+ label\s*\{(.*?)\}", css, re.S).group(1)
+        self.assertIn("var(--selected)", checked)
+        self.assertIn("box-shadow", checked)  # kalın çerçeve
+        self.assertIn("font-weight: 800", checked)  # renkten bağımsız ikinci ipucu
+        mark = re.search(r"\.option-card input:checked \+ label::after\s*\{(.*?)\}", css, re.S).group(1)
+        self.assertIn('content: "✓"', mark)  # renkten bağımsız üçüncü ipucu
+
+    def test_selected_color_differs_clearly_from_the_unselected_border(self):
+        palette = load_palette()
+        # Seçili (kırmızı) ile seçilmemiş (gri) çerçeve birbirinden ayırt edilebilmeli: renk tonu çok farklı.
+        selected = [int(palette["selected"].lstrip("#")[i:i + 2], 16) for i in (0, 2, 4)]
+        unselected = [int(palette["border-strong"].lstrip("#")[i:i + 2], 16) for i in (0, 2, 4)]
+        self.assertGreater(selected[0], 180)  # baskın kırmızı kanal
+        self.assertLess(max(selected[1:]), 60)  # yeşil ve mavi çok düşük
+        self.assertLess(max(unselected) - min(unselected), 60)  # gri: kanallar birbirine yakın
 
     def test_decorative_accents_are_never_used_as_text_color(self):
         css = CSS_PATH.read_text(encoding="utf-8")
