@@ -297,9 +297,10 @@ class PollDetailTests(TestCase):
         values = re.findall(r'type="radio"[^>]*value="(\d+)"', response.content.decode())
         self.assertEqual(values, ["0", "1", "2"])
 
-    def test_vote_form_is_inactive_for_now(self):
+    def test_vote_form_posts_to_vote_url(self):
         response = self.client.get(self.poll.get_absolute_url())
-        self.assertContains(response, "<fieldset disabled>")
+        self.assertContains(response, f'action="/anket/{self.poll.public_id}/oy/"')
+        self.assertNotContains(response, "<fieldset disabled>")
 
     def test_title_and_description(self):
         response = self.client.get(self.poll.get_absolute_url())

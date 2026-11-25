@@ -76,3 +76,48 @@ class Option(models.Model):
 
     def __str__(self):
         return self.text
+
+
+class Vote(models.Model):
+    """Bir ankete verilmiş tek oy.
+
+    Oy ya bir üyeye (`user`) ya da bir misafire (`voter_token`) aittir; ikisi birden ya da
+    hiçbiri olamaz. Aynı kişi aynı ankete yalnızca bir kez oy verebilir (veritabanı kısıtları).
+    """
+
+    poll = models.ForeignKey(Poll, on_delete=models.CASCADE, related_name="votes")
+    option = models.ForeignKey(Option, on_delete=models.CASCADE, related_name="votes")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True, related_name="votes")
+    voter_token = models.UUIDField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "oy"
+        verbose_name_plural = "oylar"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["poll", "user"],
+                condition=Q(user__isnull=False),
+                name="polls_vote_poll_user_unique",
+            ),
+            models.UniqueConstraint(
+                fields=["poll", "voter_token"],
+                condition=Q(voter_token__isnull=False),
+                name="polls_vote_poll_token_unique",
+            ),
+            # Tam olarak biri dolu olmalı: üye XOR misafir.
+            models.CheckConstraint(
+                condition=(Q(user__isnull=False) & Q(voter_token__isnull=True))
+                | (Q(user__isnull=True) & Q(voter_token__isnull=False)),
+                name="polls_vote_user_xor_token",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.poll_id} -> {self.option_id}"
+
+    def save(self, *args, **kwargs):
+        # Seçenek, oy verilen ankete ait olmalı.
+        if self.option.poll_id != self.poll_id:
+            raise ValueError("Seçenek bu ankete ait değil.")
+        super().save(*args, **kwargs)

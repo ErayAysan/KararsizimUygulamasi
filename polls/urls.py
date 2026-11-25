@@ -12,4 +12,5 @@ urlpatterns = [
     # "yeni/" kodlu yoldan ÖNCE tanımlanır (10 karakter olmadığı için çakışmaz, yine de sıra korunur).
     path("anket/yeni/", views.poll_create, name="create"),
     path("anket/<public_id:public_id>/", views.poll_detail, name="detail"),
+    path("anket/<public_id:public_id>/oy/", views.vote, name="vote"),
 ]

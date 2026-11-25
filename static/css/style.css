@@ -501,3 +501,84 @@ fieldset:disabled .option-card label {
 .options > .btn {
   margin-bottom: 1rem;
 }
+
+/* ---------- Faz 4: oylama ve sonuçlar ---------- */
+.message--warning,
+.message--info {
+  color: var(--text);
+}
+
+.results {
+  list-style: none;
+  margin: 0 0 1.25rem;
+  padding: 0;
+}
+
+.result {
+  margin-bottom: 1rem;
+}
+
+.result__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.75rem;
+  font-weight: 600;
+}
+
+.result__badges {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.badge {
+  display: inline-block;
+  background: var(--primary-soft);
+  color: var(--primary-hover);
+  border-radius: 999px;
+  padding: 0.1rem 0.6rem;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.badge--winner {
+  background: transparent;
+  padding: 0;
+  font-size: 1.1rem;
+}
+
+/* Çubuk: kenarlık, pastel dolgunun arka planla yeterli kontrastını sağlar. */
+.result__bar {
+  height: 1.5rem;
+  margin-top: 0.35rem;
+  background: var(--surface);
+  border: 2px solid var(--text-muted);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.result__fill {
+  height: 100%;
+  border-radius: 999px 0 0 999px;
+  min-width: 0;
+}
+
+.opt-1 .result__fill { background: var(--opt-1); }
+.opt-2 .result__fill { background: var(--opt-2); }
+.opt-3 .result__fill { background: var(--opt-3); }
+.opt-4 .result__fill { background: var(--opt-4); }
+.opt-5 .result__fill { background: var(--opt-5); }
+
+.result__numbers {
+  margin: 0.25rem 0 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.poll-total {
+  margin: 1.25rem 0 0;
+  color: var(--text-muted);
+  text-align: center;
+}

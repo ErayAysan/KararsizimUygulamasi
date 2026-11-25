@@ -12,20 +12,49 @@
     <time datetime="{{ poll.created_at|date:'c' }}">{{ poll.created_at|since }}</time>
   </p>
 
-  {# Faz 4'te bu form oy gönderecek. Radio değeri seçeneğin id'si değil, `order` değeridir. #}
-  <form class="vote-form">
-    <fieldset disabled>
+  {% if show_results %}
+  <ol class="results" aria-label="Sonuçlar">
+    {% for option in options %}
+    <li class="result opt-{{ forloop.counter }}">
+      <div class="result__head">
+        <span class="result__text">{{ option.text }}</span>
+        <span class="result__badges">
+          {% if option.is_mine %}<span class="badge">✓ Senin oyun</span>{% endif %}
+          {% if option.is_winner %}<span class="badge badge--winner" role="img" aria-label="En çok oy alan seçenek">🏆</span>{% endif %}
+        </span>
+      </div>
+      <div class="result__bar" role="img" aria-label="{{ option.text }}: yüzde {{ option.percent }}, {{ option.vote_count }} oy">
+        <div class="result__fill" style="width: {{ option.percent }}%"></div>
+      </div>
+      <p class="result__numbers">%{{ option.percent }} · {{ option.vote_count }} oy</p>
+    </li>
+    {% endfor %}
+  </ol>
+  {% endif %}
+
+  {% if can_vote %}
+  <form class="vote-form" method="post" action="{% url 'polls:vote' poll.public_id %}">
+    {% csrf_token %}
+    {% if show_results %}<p class="muted">Sen de oy verebilirsin:</p>{% endif %}
+    <fieldset>
       <legend class="visually-hidden">Seçenekler</legend>
-      {% for option in poll.options.all %}
+      {# Radio değeri seçeneğin id'si değil, `order` değeridir. #}
+      {% for option in options %}
       <div class="option-card opt-{{ forloop.counter }}">
-        <input type="radio" name="option" id="option-{{ option.order }}" value="{{ option.order }}">
+        <input type="radio" name="option" id="option-{{ option.order }}" value="{{ option.order }}" {% if forloop.first %}required{% endif %}>
         <label for="option-{{ option.order }}">{{ option.text }}</label>
       </div>
       {% endfor %}
     </fieldset>
-    <button type="button" class="btn btn--primary btn--block" disabled>Oyumu Ver</button>
-    <p class="muted form-footer">Oylama çok yakında açılıyor.</p>
+    <button type="submit" class="btn btn--primary btn--block">Oyumu Ver</button>
   </form>
+  {% endif %}
+
+  {% if not can_vote %}
+  <p class="muted">Oyunu verdin, teşekkürler! 🙌</p>
+  {% endif %}
+
+  <p class="poll-total">Toplam <strong>{{ total_votes }}</strong> oy</p>
 </article>
 
 <p><a href="{% url 'polls:list' %}">← Tüm anketler</a></p>
