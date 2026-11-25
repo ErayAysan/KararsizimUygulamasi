@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Güvenlik doğrulaması başarısız · Kararsızım</title>
+  <meta name="robots" content="noindex">
+  <style>
+    /* CSRF hata sayfası şablon bağlamı olmadan çizilir (kullanıcı/oturum bilgisi yok); bu yüzden bağımsızdır. */
+    body { margin: 0; background: #FFF9F2; color: #1F2340; font: 400 16px/1.5 Nunito, system-ui, sans-serif; }
+    main { max-width: 460px; margin: 4rem auto; padding: 0 1rem; text-align: center; }
+    .card { background: #FFFFFF; border: 1px solid #ECE4F7; border-radius: 16px; box-shadow: 0 4px 16px rgba(31, 35, 64, 0.08); padding: 2rem 1.5rem; }
+    h1 { font-weight: 800; margin: 0.5rem 0; }
+    p { color: #545A75; }
+    .emoji { font-size: 3rem; margin: 0; }
+    a { display: inline-block; background: #5B3FD9; color: #FFFFFF; font-weight: 600; text-decoration: none; border-radius: 999px; padding: 0.6rem 1.4rem; }
+    a:hover { background: #4A30BF; }
+    a:focus-visible { outline: 3px solid #5B3FD9; outline-offset: 2px; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="card">
+      <p class="emoji" aria-hidden="true">⏳</p>
+      <h1>Sayfanın süresi dolmuş olabilir</h1>
+      <p>Güvenlik doğrulaması başarısız oldu. Bu genellikle sayfa çok uzun süre açık kaldığında ya da çerezler kapalı olduğunda olur. Sayfayı yenileyip işlemi tekrar dene.</p>
+      <a href="/">Ana sayfaya dön</a>
+    </div>
+  </main>
+</body>
+</html>

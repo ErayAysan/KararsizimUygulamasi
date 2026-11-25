@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}Kararsızım 🤔{% endblock %}</title>
   <meta name="description" content="{% block meta_description %}Kararsız kaldığın konuda diğer kullanıcılara danış: anket aç, oyları topla, karar ver.{% endblock %}">
+  <meta name="theme-color" content="#5B3FD9">
   <link rel="icon" href="{% static 'img/logo.svg' %}" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,8 +13,9 @@
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
+  <a class="skip-link" href="#icerik">İçeriğe geç</a>
   {% include "partials/navbar.html" %}
-  <main class="container">
+  <main class="container" id="icerik" tabindex="-1">
     {% include "partials/messages.html" %}
     {% block content %}{% endblock %}
   </main>
