@@ -1,8 +1,41 @@
 {% extends "base.html" %}
 
+{% block title %}Kararsızım 🤔 · Anketler{% endblock %}
+
 {% block content %}
-<section class="card hero">
-  <h1>Merhaba! 👋</h1>
-  <p class="muted">Kararsızım'a hoş geldin. Kararsız kaldığın konularda diğerlerine danışabileceğin anketler çok yakında burada olacak.</p>
-</section>
+<div class="page-header">
+  <h1>Anketler</h1>
+  <a class="btn btn--primary" href="{% url 'polls:create' %}">➕ Yeni anket aç</a>
+</div>
+
+{% if page.object_list %}
+  <div class="poll-list">
+    {% for poll in page.object_list %}
+      {% include "partials/poll_card.html" %}
+    {% endfor %}
+  </div>
+
+  {% if page.has_other_pages %}
+  <nav class="pagination" aria-label="Sayfalar">
+    {% if page.has_previous %}
+      <a class="btn btn--soft" href="?page={{ page.previous_page_number }}" rel="prev">← Yeni</a>
+    {% else %}
+      <span class="btn btn--soft btn--disabled" aria-disabled="true">← Yeni</span>
+    {% endif %}
+    <span class="pagination__info">Sayfa {{ page.number }} / {{ page.paginator.num_pages }}</span>
+    {% if page.has_next %}
+      <a class="btn btn--soft" href="?page={{ page.next_page_number }}" rel="next">Eski →</a>
+    {% else %}
+      <span class="btn btn--soft btn--disabled" aria-disabled="true">Eski →</span>
+    {% endif %}
+  </nav>
+  {% endif %}
+{% else %}
+  <section class="card empty-state">
+    <p class="empty-state__emoji" aria-hidden="true">🫥</p>
+    <h2>Henüz kimse kararsız değil…</h2>
+    <p class="muted">İlk anketi sen aç!</p>
+    <a class="btn btn--primary" href="{% url 'polls:create' %}">➕ Yeni anket aç</a>
+  </section>
+{% endif %}
 {% endblock %}

@@ -1,0 +1,9 @@
+{% load poll_extras %}<article class="card poll-card">
+  <h2 class="poll-card__question"><a href="{{ poll.get_absolute_url }}">{{ poll.question }}</a></h2>
+  <p class="poll-meta">
+    <span>@{{ poll.author.username }}</span>
+    <span>{{ poll.created_at|since }}</span>
+    <span>{{ poll.option_count }} seçenek</span>
+  </p>
+  <a class="btn btn--soft" href="{{ poll.get_absolute_url }}">Oy ver →</a>
+</article>
