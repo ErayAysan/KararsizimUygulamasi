@@ -1,0 +1,22 @@
+{% load static %}<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Kararsızım 🤔{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}Kararsız kaldığın konuda diğer kullanıcılara danış: anket aç, oyları topla, karar ver.{% endblock %}">
+  <link rel="icon" href="{% static 'img/logo.svg' %}" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+  {% include "partials/navbar.html" %}
+  <main class="container">
+    {% include "partials/messages.html" %}
+    {% block content %}{% endblock %}
+  </main>
+  <script src="{% static 'js/main.js' %}" defer></script>
+</body>
+</html>
