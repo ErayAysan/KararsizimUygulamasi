@@ -108,3 +108,55 @@
     Array.prototype.forEach.call(document.querySelectorAll("form[data-submitting]"), release);
   });
 })();
+
+// Paylaşım: JS yokken bağlantı kutusu seçilip kopyalanabilir ve WhatsApp bağlantısı çalışır.
+// JS ile "Kopyala" (ve tarayıcı destekliyorsa sistem paylaşım menüsünü açan "Paylaş") düğmeleri görünür.
+(function () {
+  var box = document.querySelector("[data-share]");
+  if (!box) return;
+
+  var input = box.querySelector("[data-share-url]");
+  var status = box.querySelector("[data-share-status]");
+  var copyButton = box.querySelector("[data-copy]");
+  var shareButton = box.querySelector("[data-native-share]");
+
+  function say(text) {
+    status.textContent = "";
+    window.setTimeout(function () { status.textContent = text; }, 50);
+  }
+
+  // Tek tıkla tüm bağlantı seçilir.
+  input.addEventListener("focus", function () { input.select(); });
+  input.addEventListener("click", function () { input.select(); });
+
+  function fallbackCopy() {
+    input.focus();
+    input.select();
+    try { return document.execCommand("copy"); } catch (error) { return false; }
+  }
+
+  copyButton.hidden = false;
+  copyButton.addEventListener("click", function () {
+    var url = input.value;
+    var done = function () { say("Bağlantı kopyalandı."); };
+    var failed = function () {
+      say(fallbackCopy() ? "Bağlantı kopyalandı." : "Kopyalanamadı. Bağlantıyı seçip kopyalayabilirsin.");
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(done, failed);
+    } else {
+      failed();
+    }
+  });
+
+  if (navigator.share) {
+    shareButton.hidden = false;
+    shareButton.addEventListener("click", function () {
+      navigator.share({
+        title: box.dataset.shareTitle,
+        text: box.dataset.shareText,
+        url: input.value
+      }).catch(function () { /* kullanıcı paylaşımı kapattı: sessizce geç */ });
+    });
+  }
+})();
