@@ -37,6 +37,9 @@ if not SECRET_KEY:
         raise RuntimeError("DJANGO_SECRET_KEY ortam değişkeni tanımlı olmalı.")
 
 ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,.vercel.app")
+# Admin adresi. Üretimde tahmin edilmesi zor, gizli bir yol verilir (Vercel'de DJANGO_ADMIN_URL);
+# lokalde varsayılan "admin/" kalır.
+ADMIN_URL = (os.environ.get("DJANGO_ADMIN_URL") or "admin").strip().strip("/") + "/"
 CSRF_TRUSTED_ORIGINS = env_list("CSRF_TRUSTED_ORIGINS", "https://*.vercel.app")
 
 
