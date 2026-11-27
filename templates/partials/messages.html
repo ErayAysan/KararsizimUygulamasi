@@ -1,7 +1,11 @@
 {% if messages %}
-<ul class="messages" aria-live="polite">
+<ul class="messages">
   {% for message in messages %}
-  <li class="message message--{{ message.tags }}"{% if message.level_tag == "error" %} role="alert"{% endif %}>{{ message }}</li>
+  <li class="message message--{{ message.tags }}"{% if message.level_tag == "error" %} role="alert"{% else %} role="status"{% endif %}>
+    <span class="message__icon" aria-hidden="true"></span>
+    <span class="visually-hidden">{% if message.level_tag == "success" %}Başarılı:{% elif message.level_tag == "error" %}Hata:{% elif message.level_tag == "warning" %}Uyarı:{% else %}Bilgi:{% endif %}</span>
+    {{ message }}
+  </li>
   {% endfor %}
 </ul>
 {% endif %}

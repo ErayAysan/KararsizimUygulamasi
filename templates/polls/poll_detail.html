@@ -12,9 +12,9 @@
     <time datetime="{{ poll.created_at|date:'c' }}">{{ poll.created_at|since }}</time>
     {% if poll.ends_at %}
       {% if is_closed %}
-      <span class="status status--closed">🔒 Süresi doldu</span>
+      <span class="status status--closed"><span aria-hidden="true">🔒</span> Süresi doldu</span>
       {% else %}
-      <span class="status status--open">⏳ <time datetime="{{ poll.ends_at|date:'c' }}">{{ poll.ends_at|remaining }}</time></span>
+      <span class="status status--open"><span aria-hidden="true">⏳</span> <time datetime="{{ poll.ends_at|date:'c' }}">{{ poll.ends_at|remaining }}</time></span>
       {% endif %}
     {% endif %}
   </p>
@@ -36,10 +36,10 @@
           {% if option.is_winner %}<span class="badge badge--winner" role="img" aria-label="En çok oy alan seçenek">🏆</span>{% endif %}
         </span>
       </div>
-      <div class="result__bar" role="img" aria-label="{{ option.text }}: yüzde {{ option.percent }}, {{ option.vote_count }} oy">
+      <div class="result__bar" role="img" aria-label="{{ option.text }}: yüzde {{ option.percent }}, {{ option.vote_count }} oy{% if total_votes %}, {{ option.place }}. sırada{% endif %}">
         <div class="result__fill" style="width: {{ option.percent }}%"></div>
       </div>
-      <p class="result__numbers">%{{ option.percent }} · {{ option.vote_count }} oy</p>
+      <p class="result__numbers">%{{ option.percent }} · {{ option.vote_count }} oy{% if total_votes %} · {{ option.place }}. sıra{% endif %}</p>
     </li>
     {% endfor %}
   </ol>
@@ -50,7 +50,7 @@
     {% csrf_token %}
     {% if show_results %}<p class="muted">Sen de oy verebilirsin:</p>{% endif %}
     <fieldset>
-      <legend class="visually-hidden">Seçenekler</legend>
+      <legend class="visually-hidden">{{ poll.question }} — seçeneklerden birini seç</legend>
       {# Radio değeri seçeneğin id'si değil, `order` değeridir. #}
       {% for option in options %}
       <div class="option-card opt-{{ forloop.counter }}">
@@ -70,5 +70,5 @@
   <p class="poll-total">Toplam <strong>{{ total_votes }}</strong> oy</p>
 </article>
 
-<p><a href="{% url 'polls:list' %}">← Tüm anketler</a></p>
+<p><a class="back-link" href="{% url 'polls:list' %}"><span aria-hidden="true">←</span> Tüm anketler</a></p>
 {% endblock %}

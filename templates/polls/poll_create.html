@@ -5,7 +5,7 @@
 
 {% block content %}
 <section class="card">
-  <h1>Yeni anket ✨</h1>
+  <h1>Yeni anket <span aria-hidden="true">✨</span></h1>
   <p class="muted">Kararsız kaldığın konuyu yaz, 2 ile 5 arasında seçenek ekle.</p>
 
   <form method="post">
@@ -17,6 +17,7 @@
 
     <fieldset class="options" data-option-list>
       <legend>Seçenekler <span class="muted">(en az 2, en fazla 5)</span></legend>
+      <p class="visually-hidden" role="status" aria-live="polite" data-option-status></p>
 
       {% if form.non_field_errors %}
       <ul class="field__errors" role="alert">
@@ -34,7 +35,7 @@
       </div>
       {% endfor %}
 
-      <button type="button" class="btn btn--soft" data-add-option hidden>➕ Seçenek ekle</button>
+      <button type="button" class="btn btn--soft" data-add-option hidden><span aria-hidden="true">➕</span> Seçenek ekle</button>
     </fieldset>
 
     {% with field=form.duration %}

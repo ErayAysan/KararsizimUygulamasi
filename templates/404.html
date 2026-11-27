@@ -10,7 +10,7 @@
   <p class="muted">Adres yanlış yazılmış ya da anket artık yok olabilir. Kararsız kalma, ana sayfadan devam et!</p>
   <p class="empty-state__actions">
     <a class="btn btn--primary" href="{% url 'polls:list' %}">Ana sayfaya dön</a>
-    <a class="btn btn--soft" href="{% url 'polls:create' %}">➕ Yeni anket aç</a>
+    <a class="btn btn--soft" href="{% url 'polls:create' %}"><span aria-hidden="true">➕</span> Yeni anket aç</a>
   </p>
 </section>
 {% endblock %}

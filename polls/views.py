@@ -65,6 +65,8 @@ def poll_detail(request, public_id):
         option.percent = _percent(option.vote_count, total_votes)
         option.is_mine = option.order == my_order
         option.is_winner = top > 0 and option.vote_count == top
+        # Sıra yazıyla da verilir (renk körleri ve ekran okuyucular için); eşit oylar aynı sırayı alır.
+        option.place = 1 + sum(1 for other in options if other.vote_count > option.vote_count)
         # Süresi dolan ankette çubuklar yeşilden (çok oy) kırmızıya (az oy) boyanır.
         option.rank = _rank_step(option.vote_count, low, top) if is_closed and total_votes else None
 
