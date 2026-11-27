@@ -2,6 +2,8 @@
 {% load poll_extras %}
 
 {% block title %}{{ poll.question }} · Kararsızım{% endblock %}
+{% block og_title %}{{ poll.question }}{% endblock %}
+{% block og_description %}{{ share_description }}{% endblock %}
 {% block meta_description %}{{ poll.question }} — Kararsızım'da bu ankete oy ver.{% endblock %}
 
 {% block content %}
@@ -82,6 +84,8 @@
   {% endif %}
 
   <p class="poll-total">Toplam <strong>{{ total_votes }}</strong> oy</p>
+
+  {% include "partials/share.html" %}
 </article>
 
 <p><a class="back-link" href="{% url 'polls:list' %}"><span aria-hidden="true">←</span> Tüm anketler</a></p>

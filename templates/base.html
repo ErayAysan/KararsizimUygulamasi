@@ -6,6 +6,21 @@
   <title>{% block title %}Kararsızım 🤔{% endblock %}</title>
   <meta name="description" content="{% block meta_description %}Kararsız kaldığın konuda diğer kullanıcılara danış: anket aç, oyları topla, karar ver.{% endblock %}">
   <meta name="theme-color" content="#5B3FD9">
+  <link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+  {# Open Graph / Twitter: bağlantı WhatsApp, Telegram, X vb.'de önizlemeyle görünür. #}
+  <meta property="og:site_name" content="Kararsızım">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="tr_TR">
+  <meta property="og:title" content="{% block og_title %}Kararsızım 🤔 · Kararsız kaldığın konuda danış{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}Kararsız kaldığın konuda diğer kullanıcılara danış: anket aç, oyları topla, karar ver.{% endblock %}">
+  <meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+  <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-image.jpg' %}">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="800">
+  <meta property="og:image:height" content="420">
+  <meta property="og:image:alt" content="Kararsızım: kararsız kaldığın konuda anket aç, oyları topla, karar ver.">
+  <meta name="twitter:card" content="summary_large_image">
+  {% block extra_head %}{% endblock %}
   <link rel="icon" href="{% static 'img/logo.svg' %}" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

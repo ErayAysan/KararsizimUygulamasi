@@ -1,0 +1,13 @@
+<section class="share" aria-labelledby="share-title" data-share data-share-title="{{ poll.question }}" data-share-text="{{ share_description }}">
+  <h2 id="share-title" class="share__title">Anketi paylaş</h2>
+  <div class="share__link">
+    <label for="share-url" class="visually-hidden">Anket bağlantısı</label>
+    <input id="share-url" type="text" readonly value="{{ share_url }}" data-share-url>
+    <button type="button" class="btn btn--soft" data-copy hidden>Kopyala</button>
+  </div>
+  <div class="share__actions">
+    <button type="button" class="btn btn--primary" data-native-share hidden><span aria-hidden="true">📤</span> Paylaş</button>
+    <a class="btn btn--soft" href="https://wa.me/?text={{ poll.question|add:' '|add:share_url|urlencode }}" target="_blank" rel="noopener noreferrer">WhatsApp<span class="visually-hidden"> ile paylaş (yeni sekmede açılır)</span></a>
+  </div>
+  <p class="share__status muted" role="status" aria-live="polite" data-share-status></p>
+</section>

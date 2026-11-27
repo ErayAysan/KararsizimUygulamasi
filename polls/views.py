@@ -79,8 +79,19 @@ def poll_detail(request, public_id):
         # Süresi dolan ankette çubuklar yeşilden (çok oy) kırmızıya (az oy) boyanır.
         option.rank = _rank_step(option.vote_count, low, top) if is_closed and total_votes else None
 
+    # Paylaşım: yalnızca herkese açık bilgiler (soru, seçenekler). Sonuçlar oyları etkilemesin diye
+    # önizlemeye ve açıklamaya ASLA konmaz.
+    share_url = request.build_absolute_uri(poll.get_absolute_url())
+    choices = " / ".join(option.text for option in options)
+    if is_closed:
+        share_description = f"@{poll.author.username} sordu: {choices}. Süresi doldu; sonuçlara göz at."
+    else:
+        share_description = f"@{poll.author.username} kararsız kaldı: {choices}. Sen ne dersin?"
+
     context = {
         "poll": poll,
+        "share_url": share_url,
+        "share_description": share_description[:200],
         "options": options,
         "total_votes": total_votes,
         "show_results": show_results,
