@@ -204,7 +204,7 @@ class AdminTests(TestCase):
             self.assertEqual(self.client.get(reverse(name)).status_code, 200, name)
 
     def test_admin_login_page_is_styled(self):
-        self.assertEqual(self.client.get("/admin/login/").status_code, 200)
+        self.assertEqual(self.client.get(reverse("admin:login")).status_code, 200)  # adres ortama göre değişir
 
 
 class EmailFieldLengthTests(TestCase):

@@ -15,7 +15,7 @@ py -3.14 -m venv .venv
 pip install -r requirements.txt
 Copy-Item .env.example .env      # sonra .env içindeki değerleri düzenle
 python manage.py migrate
-python manage.py createsuperuser # /admin/ için
+python manage.py createsuperuser # admin için (adres: DJANGO_ADMIN_URL, varsayılan /admin/)
 python manage.py runserver
 ```
 
@@ -42,4 +42,8 @@ python manage.py test
 
 GitHub'a push edilen `main` dalı Vercel'de production'a, diğer dallar preview'a deploy edilir.
 Vercel ortam değişkenleri: `DJANGO_SECRET_KEY`, `DJANGO_DEBUG=False`, `DJANGO_ALLOWED_HOSTS`,
-`CSRF_TRUSTED_ORIGINS`, `DATABASE_URL` (transaction pooler, port 6543).
+`CSRF_TRUSTED_ORIGINS`, `DJANGO_ADMIN_URL` (gizli admin yolu), `DATABASE_URL` (transaction pooler, port 6543).
+
+## Lisans
+
+[MIT](LICENSE)
