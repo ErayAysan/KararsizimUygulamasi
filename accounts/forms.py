@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 
+from . import throttle
 from .models import User
 
 EMAIL_MAX_LENGTH = User._meta.get_field("email").max_length  # 254
@@ -51,4 +52,11 @@ class LoginForm(AuthenticationForm):
     error_messages = {
         "invalid_login":"E-posta veya şifre hatalı. Lütfen tekrar dene.",
         "inactive": "Bu hesap devre dışı.",
+        "throttled": throttle.THROTTLED_MESSAGE,
     }
+
+    def clean(self):
+        username = self.cleaned_data.get("username")
+        if username and throttle.is_blocked(self.request, username):
+            raise forms.ValidationError(self.error_messages["throttled"], code="throttled")
+        return super().clean()

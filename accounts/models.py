@@ -44,3 +44,22 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+
+
+class LoginAttempt(models.Model):
+    """Başarısız bir giriş denemesi (hız sınırı için).
+
+    Kişisel veri saklanmaz: `key`, e-posta/kullanıcı adının ya da IP adresinin gizli anahtarla
+    alınmış özetidir (bkz. `accounts.throttle`). Eski kayıtlar kendiliğinden silinir.
+    """
+
+    key = models.CharField(max_length=64)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [models.Index(fields=["key", "created_at"], name="accounts_la_key_created_idx")]
+        verbose_name = "giriş denemesi"
+        verbose_name_plural = "giriş denemeleri"
+
+    def __str__(self):
+        return f"{self.key[:8]}… {self.created_at:%Y-%m-%d %H:%M}"
