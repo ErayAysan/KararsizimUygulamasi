@@ -6,7 +6,7 @@
 {% block content %}
 <div class="page-header">
   <h1>Anketler</h1>
-  <a class="btn btn--primary" href="{% url 'polls:create' %}">➕ Yeni anket aç</a>
+  <a class="btn btn--primary" href="{% url 'polls:create' %}"><span aria-hidden="true">➕</span> Yeni anket aç</a>
 </div>
 
 <nav class="tabs" aria-label="Anket durumu">
@@ -28,7 +28,7 @@
     {% else %}
       <span class="btn btn--soft btn--disabled" aria-disabled="true">← Yeni</span>
     {% endif %}
-    <span class="pagination__info">Sayfa {{ page.number }} / {{ page.paginator.num_pages }}</span>
+    <span class="pagination__info" aria-current="page">Sayfa {{ page.number }} / {{ page.paginator.num_pages }}</span>
     {% if page.has_next %}
       <a class="btn btn--soft" href="?{% if status == 'bitti' %}durum=bitti&amp;{% endif %}page={{ page.next_page_number }}" rel="next">Eski →</a>
     {% else %}
@@ -47,7 +47,7 @@
     <p class="empty-state__emoji" aria-hidden="true">🫥</p>
     <h2>Henüz kimse kararsız değil…</h2>
     <p class="muted">İlk anketi sen aç!</p>
-    <a class="btn btn--primary" href="{% url 'polls:create' %}">➕ Yeni anket aç</a>
+    <a class="btn btn--primary" href="{% url 'polls:create' %}"><span aria-hidden="true">➕</span> Yeni anket aç</a>
   </section>
 {% endif %}
 {% endblock %}

@@ -10,6 +10,14 @@
   var MIN = 2;
   var rows = Array.prototype.slice.call(list.querySelectorAll("[data-option-row]"));
   var addButton = list.querySelector("[data-add-option]");
+  var status = list.querySelector("[data-option-status]");
+
+  // Ekran okuyucu kullanıcıları alan eklendiğini/silindiğini duysun.
+  function announce(text) {
+    if (!status) return;
+    status.textContent = "";
+    window.setTimeout(function () { status.textContent = text; }, 50);
+  }
 
   function input(row) { return row.querySelector("input"); }
   function visibleRows() { return rows.filter(function (row) { return !row.hidden; }); }
@@ -38,6 +46,7 @@
     next.hidden = false;
     refresh();
     input(next).focus();
+    announce("Seçenek eklendi. Şu an " + visibleRows().length + " seçenek var.");
   });
 
   list.addEventListener("click", function (event) {
@@ -51,6 +60,7 @@
     rows.splice(rows.indexOf(row), 1);
     rows.push(row);
     refresh();
+    announce("Seçenek silindi. Şu an " + visibleRows().length + " seçenek var.");
     var firstVisible = visibleRows()[0];
     if (firstVisible) input(firstVisible).focus();
   });

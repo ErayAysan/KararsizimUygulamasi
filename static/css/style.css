@@ -40,6 +40,8 @@
 
 html {
   font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
@@ -730,3 +732,146 @@ a {
 .rank-2 .result__fill { background: var(--rank-2); }
 .rank-3 .result__fill { background: var(--rank-3); }
 .rank-4 .result__fill { background: var(--rank-4); }
+
+/* ---------- Faz 7: erişilebilirlik (ekran okuyucu, renk körlüğü, mobil) ---------- */
+
+/* Dokunma hedefleri en az 44x44 px (WCAG 2.5.5); fare kullanıcıları için görünüm bozulmaz. */
+.btn,
+.tabs__link {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.btn--block {
+  display: flex;
+}
+
+.navbar__brand,
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 44px;
+}
+
+.btn--icon {
+  min-width: 44px;
+}
+
+.pagination__info {
+  text-align: center;
+}
+
+@media (max-width: 480px) {
+  .navbar__links .btn {
+    min-height: 44px;
+  }
+
+  .tabs {
+    flex-wrap: wrap;
+  }
+
+  .tabs__link {
+    flex: 1 1 auto;
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .card {
+    padding: 1.25rem;
+  }
+
+  /* Giriş yapmış kullanıcının menüsü 320 px'e sığmaz; kullanıcı adı kendi satırına, düğmeler altına geçer
+     (yatay kaydırma olmasın: WCAG 1.4.10). */
+  .navbar__links {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .navbar__user {
+    flex: 1 1 100%;
+    max-width: none;
+  }
+}
+
+/* Başka renkle bilgi verme: her mesajın başında ikon vardır (renk tek ipucu değil). */
+.message {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+  font-weight: 600;
+}
+
+.message__icon::before {
+  font-weight: 800;
+}
+
+.message--success .message__icon::before { content: "✓"; }
+.message--error .message__icon::before   { content: "✕"; }
+.message--warning .message__icon::before { content: "!"; }
+.message--info .message__icon::before    { content: "i"; }
+
+.field__errors li::before {
+  content: "✕ ";
+  font-weight: 800;
+}
+
+/* Windows Yüksek Karşıtlık modunda arka plan renkleri kaybolur; çubuklar ve seçili kart sistem renkleriyle çizilir. */
+@media (forced-colors: active) {
+  .result__bar {
+    border-color: CanvasText;
+  }
+
+  .result__fill {
+    background: Highlight !important;
+    forced-color-adjust: none;
+  }
+
+  .option-card label,
+  .tabs__link {
+    border-color: CanvasText;
+  }
+
+  .option-card input:checked + label,
+  .tabs__link--current {
+    border-color: Highlight;
+    outline: 3px solid Highlight;
+  }
+
+  .btn--primary {
+    border-color: ButtonText;
+  }
+}
+
+/* Açılır liste (anket süresi): metin alanlarıyla aynı görünüm, 44 px yükseklik. */
+.field select {
+  width: 100%;
+  min-height: 44px;
+  font: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 2px solid var(--border-strong);
+  border-radius: 12px;
+  padding: 0.6rem 0.8rem;
+}
+
+.field select:focus-visible {
+  border-color: var(--primary);
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.field input[type="text"],
+.field input[type="email"],
+.field input[type="password"],
+.option-row input[type="text"] {
+  min-height: 44px;
+}

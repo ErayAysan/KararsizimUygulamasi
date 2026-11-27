@@ -234,7 +234,7 @@ class AccessibilityStructureTests(TestCase):
         poll = make_poll(make_user())
         html = self.client.get(poll.get_absolute_url()).content.decode()
         self.assertEqual(len(re.findall(r'<input type="radio"', html)), 2)
-        self.assertIn('<legend class="visually-hidden">Seçenekler</legend>', html)
+        self.assertRegex(html, r'<legend class="visually-hidden">[^<]*seçeneklerden birini seç</legend>')  # soru, grubun adı olur
 
     def test_error_messages_are_announced(self):
         user = make_user()

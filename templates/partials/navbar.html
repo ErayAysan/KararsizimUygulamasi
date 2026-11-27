@@ -1,6 +1,6 @@
 <header class="navbar">
   <nav class="navbar__inner container" aria-label="Ana gezinme">
-    <a class="navbar__brand" href="{% url 'polls:list' %}">Kararsızım 🤔</a>
+    <a class="navbar__brand" href="{% url 'polls:list' %}">Kararsızım <span aria-hidden="true">🤔</span></a>
     <ul class="navbar__links">
       {% if user.is_authenticated %}
         <li class="navbar__user">@{{ user.username }}</li>

@@ -6,8 +6,8 @@
     <span>{{ poll.option_count }} seçenek</span>
     <span>{{ poll.vote_count }} oy</span>
     {% if poll.ends_at %}
-      {% if poll.is_closed %}<span>🔒 Süresi doldu</span>{% else %}<span>⏳ {{ poll.ends_at|remaining }}</span>{% endif %}
+      {% if poll.is_closed %}<span><span aria-hidden="true">🔒</span> Süresi doldu</span>{% else %}<span><span aria-hidden="true">⏳</span> {{ poll.ends_at|remaining }}</span>{% endif %}
     {% endif %}
   </p>
-  <a class="btn btn--soft" href="{{ poll.get_absolute_url }}">{% if poll.is_closed %}Sonuçlara bak →{% else %}Oy ver →{% endif %}</a>
+  <a class="btn btn--soft" href="{{ poll.get_absolute_url }}">{% if poll.is_closed %}Sonuçlara bak{% else %}Oy ver{% endif %}<span class="visually-hidden">: {{ poll.question }}</span> <span aria-hidden="true">→</span></a>
 </article>
