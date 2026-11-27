@@ -38,6 +38,8 @@ class Poll(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     # Boşsa anket süresizdir. Süre dolunca oy kapanır ve sonuçlar herkese açılır.
     ends_at = models.DateTimeField("bitiş zamanı", null=True, blank=True, db_index=True)
+    # Anket sahibi oluştururken seçer; açıksa oy verenler süre dolana kadar oylarını değiştirebilir.
+    allow_vote_change = models.BooleanField("oy değiştirilebilir", default=False)
 
     objects = PollQuerySet.as_manager()
 

@@ -45,6 +45,8 @@ TEXT_PAIRS = [
     ("white", "selected"),  # seçili seçenekteki ✓ işareti
     ("success", "primary-soft"), ("success", "bg"), ("success", "surface"),
     ("error", "surface"), ("error", "primary-soft"), ("error", "bg"),
+    ("white", "error"),  # silme düğmesi (Evet, anketi sil)
+    ("primary-hover", "primary-soft"),  # "Oy değiştirilebilir" rozeti
 ] + [("text", option) for option in OPTIONS]
 
 # Arayüz bileşenleri (kenarlık, odak halkası, seçili durum) için en az 3:1 (WCAG 1.4.11)

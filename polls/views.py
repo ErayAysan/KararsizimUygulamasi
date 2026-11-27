@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import redirect_to_login
 from django.core.paginator import Paginator
 from django.db import IntegrityError, transaction
@@ -56,6 +57,8 @@ def poll_detail(request, public_id):
     is_author = request.user.is_authenticated and poll.author_id == request.user.id
 
     is_closed = poll.is_closed
+    # Oy verdiyse ve anket sahibi izin verdiyse (ve süre dolmadıysa) oy değiştirilebilir.
+    can_change = not is_closed and my_order is not None and poll.allow_vote_change
     # Sonuçlar yalnızca oy vermiş kişiye ve anket sahibine gösterilir (sonuçlar oyları etkilemesin);
     # süresi dolan anketin sonuçları artık oyları etkilemeyeceği için herkese açılır.
     show_results = is_closed or my_order is not None or is_author
@@ -76,6 +79,9 @@ def poll_detail(request, public_id):
         "total_votes": total_votes,
         "show_results": show_results,
         "can_vote": not is_closed and my_order is None,
+        "can_change": can_change,
+        "show_vote_form": not is_closed and (my_order is None or can_change),
+        "is_author": is_author,
         "is_closed": is_closed,
     }
     return render(request, "polls/poll_detail.html", context)
@@ -105,8 +111,16 @@ def vote(request, public_id):
         return redirect(poll)
 
     voter = _voter(request)
-    if Vote.objects.filter(poll=poll, **voter).exists():
-        messages.warning(request, "Bu ankete zaten oy verdin.")
+    existing = Vote.objects.filter(poll=poll, **voter).first()
+    if existing is not None:
+        if not poll.allow_vote_change:
+            messages.warning(request, "Bu ankete zaten oy verdin.")
+        elif existing.option_id == option.id:
+            messages.info(request, "Oyun zaten bu seçenekte.")
+        else:
+            existing.option = option
+            existing.save(update_fields=["option"])
+            messages.success(request, "Oyun değiştirildi. 🔄")
         return redirect(poll)
 
     try:
@@ -119,6 +133,20 @@ def vote(request, public_id):
 
     messages.success(request, "Oyun kaydedildi! 🎉")
     return redirect(poll)
+
+
+@login_required
+def poll_delete(request, public_id):
+    """Anketi yalnızca sahibi silebilir. GET onay sayfasını gösterir, POST siler (oylar da silinir).
+
+    Başkasının anketi için 404 döner; böylece anketin var olup olmadığı da sızmaz.
+    """
+    poll = get_object_or_404(Poll.objects.filter(author=request.user).annotate(vote_count=Count("votes")), public_id=public_id)
+    if request.method == "POST":
+        poll.delete()
+        messages.success(request, "Anketin silindi.")
+        return redirect("polls:list")
+    return render(request, "polls/poll_confirm_delete.html", {"poll": poll})
 
 
 def poll_create(request):
