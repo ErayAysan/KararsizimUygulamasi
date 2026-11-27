@@ -55,7 +55,10 @@ UI_PAIRS = [
 ] + [("border-strong", option) for option in OPTIONS] + [("primary", option) for option in OPTIONS] + [
     # Seçili oy seçeneğinin kırmızı çerçevesi: kartın içine (pastel) ve dışına (beyaz) karşı belirgin olmalı.
     ("selected", "surface"), ("selected", "bg"),
-] + [("selected", option) for option in OPTIONS]
+] + [("selected", option) for option in OPTIONS] + [
+    # Süresi dolan anketin yeşil -> kırmızı sonuç çubukları, beyaz çubuk zeminine karşı seçilebilmeli.
+    (f"rank-{step}", "surface") for step in range(5)
+]
 
 
 class ContrastTests(SimpleTestCase):

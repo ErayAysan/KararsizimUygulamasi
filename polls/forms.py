@@ -1,9 +1,22 @@
+from datetime import timedelta
+
 from django import forms
 from django.db import transaction
+from django.utils import timezone
 
 from .models import MAX_OPTIONS, MIN_OPTIONS, Option, Poll
 
 OPTION_MAX_LENGTH = Option._meta.get_field("text").max_length
+
+# Hazır anket süreleri: değer saat cinsindendir; "0" süresiz demektir.
+DURATION_CHOICES = [
+    ("0", "Süresiz"),
+    ("1", "1 saat"),
+    ("6", "6 saat"),
+    ("24", "1 gün"),
+    ("72", "3 gün"),
+    ("168", "1 hafta"),
+]
 
 
 class PollForm(forms.Form):
@@ -24,6 +37,14 @@ class PollForm(forms.Form):
             "min_length": "Soru en az 5 karakter olmalı.",
             "max_length": "Soru en fazla 200 karakter olabilir.",
         },
+    )
+
+    duration = forms.ChoiceField(
+        label="Anket süresi",
+        choices=DURATION_CHOICES,
+        initial="0",
+        required=False,
+        error_messages={"invalid_choice": "Geçerli bir süre seç."},
     )
 
     def __init__(self, data=None, *args, **kwargs):
@@ -70,7 +91,9 @@ class PollForm(forms.Form):
     def save(self, author):
         """Anketi ve seçenekleri tek işlemde (atomik) kaydeder."""
         with transaction.atomic():
-            poll = Poll.objects.create(author=author, question=self.cleaned_data["question"])
+            hours = int(self.cleaned_data.get("duration") or 0)
+            ends_at = timezone.now() + timedelta(hours=hours) if hours else None
+            poll = Poll.objects.create(author=author, question=self.cleaned_data["question"], ends_at=ends_at)
             Option.objects.bulk_create(
                 [Option(poll=poll, text=text, order=index) for index, text in enumerate(self.cleaned_options)]
             )

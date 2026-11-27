@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db import IntegrityError, models, transaction
 from django.db.models import Q
 from django.urls import reverse
+from django.utils import timezone
 
 # Karışan karakterler (0/o, 1/l/i) çıkarıldı. 31 harf ve 10 karakterle ~8 x 10^14 olasılık var.
 PUBLIC_ID_ALPHABET = "23456789abcdefghjkmnpqrstuvwxyz"
@@ -19,12 +20,26 @@ def generate_public_id():
     return "".join(secrets.choice(PUBLIC_ID_ALPHABET) for _ in range(PUBLIC_ID_LENGTH))
 
 
+class PollQuerySet(models.QuerySet):
+    def active(self):
+        """Süresi devam eden ya da süresiz anketler."""
+        return self.filter(Q(ends_at__isnull=True) | Q(ends_at__gt=timezone.now()))
+
+    def closed(self):
+        """Süresi dolmuş anketler."""
+        return self.filter(ends_at__lte=timezone.now())
+
+
 class Poll(models.Model):
     # `id` yalnızca veritabanı içindir; hiçbir yerde (URL, şablon, JSON) dışarı gösterilmez.
     public_id = models.CharField(max_length=PUBLIC_ID_LENGTH, unique=True, db_index=True, editable=False)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="polls")
     question = models.CharField("soru", max_length=200)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    # Boşsa anket süresizdir. Süre dolunca oy kapanır ve sonuçlar herkese açılır.
+    ends_at = models.DateTimeField("bitiş zamanı", null=True, blank=True, db_index=True)
+
+    objects = PollQuerySet.as_manager()
 
     class Meta:
         ordering = ["-created_at"]
@@ -36,6 +51,10 @@ class Poll(models.Model):
 
     def get_absolute_url(self):
         return reverse("polls:detail", args=[self.public_id])
+
+    @property
+    def is_closed(self):
+        return self.ends_at is not None and self.ends_at <= timezone.now()
 
     def save(self, *args, **kwargs):
         """Yeni kayıtta kod üretir. Nadir bir çakışmada yeni kodla en fazla 5 kez dener.

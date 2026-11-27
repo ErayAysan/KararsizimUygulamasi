@@ -20,19 +20,28 @@ def _voter(request):
 
 
 def poll_list(request):
+    # İki sekme: "aktif" (süresi devam eden ve süresiz) ve "bitti" (süresi dolan).
+    status = "bitti" if request.GET.get("durum") == "bitti" else "aktif"
+    polls = Poll.objects.closed() if status == "bitti" else Poll.objects.active()
     polls = (
-        Poll.objects.select_related("author")
+        polls.select_related("author")
         # İki ayrı ilişki aynı sorguda sayıldığı için distinct şart (aksi hâlde çarpılırlar).
         .annotate(option_count=Count("options", distinct=True), vote_count=Count("votes", distinct=True))
-        .order_by("-created_at")
+        .order_by("-ends_at" if status == "bitti" else "-created_at")
     )
     page = Paginator(polls, POLLS_PER_PAGE).get_page(request.GET.get("page"))
-    return render(request, "polls/poll_list.html", {"page": page})
+    return render(request, "polls/poll_list.html", {"page": page, "status": status})
 
 
 def _percent(count, total):
     """Tam sayıya yarıdan yukarı yuvarlanmış yüzde (Python'un banker yuvarlamasından kaçınır)."""
     return (count * 100 + total // 2) // total if total else 0
+
+
+def _rank_step(count, low, high):
+    """En çok oy alan 4 (yeşil), en az oy alan 0 (kırmızı); aradakiler orantılı. Eşitlikte hepsi yeşil."""
+    span = high - low
+    return 4 if span == 0 else ((count - low) * 4 + span // 2) // span
 
 
 def poll_detail(request, public_id):
@@ -46,20 +55,26 @@ def poll_detail(request, public_id):
     )
     is_author = request.user.is_authenticated and poll.author_id == request.user.id
 
-    # Sonuçlar yalnızca oy vermiş kişiye ve anket sahibine gösterilir (sonuçlar oyları etkilemesin).
-    show_results = my_order is not None or is_author
+    is_closed = poll.is_closed
+    # Sonuçlar yalnızca oy vermiş kişiye ve anket sahibine gösterilir (sonuçlar oyları etkilemesin);
+    # süresi dolan anketin sonuçları artık oyları etkilemeyeceği için herkese açılır.
+    show_results = is_closed or my_order is not None or is_author
     top = max((option.vote_count for option in options), default=0)
+    low = min((option.vote_count for option in options), default=0)
     for option in options:
         option.percent = _percent(option.vote_count, total_votes)
         option.is_mine = option.order == my_order
         option.is_winner = top > 0 and option.vote_count == top
+        # Süresi dolan ankette çubuklar yeşilden (çok oy) kırmızıya (az oy) boyanır.
+        option.rank = _rank_step(option.vote_count, low, top) if is_closed and total_votes else None
 
     context = {
         "poll": poll,
         "options": options,
         "total_votes": total_votes,
         "show_results": show_results,
-        "can_vote": my_order is None,
+        "can_vote": not is_closed and my_order is None,
+        "is_closed": is_closed,
     }
     return render(request, "polls/poll_detail.html", context)
 
@@ -67,6 +82,10 @@ def poll_detail(request, public_id):
 @require_POST
 def vote(request, public_id):
     poll = get_object_or_404(Poll, public_id=public_id)
+
+    if poll.is_closed:
+        messages.warning(request, "Bu anketin süresi doldu, artık oy verilemiyor.")
+        return redirect(poll)
 
     # Çerezler kapalıysa her istekte yeni kimlik üretilir; bu, sınırsız oya yol açar. Reddet.
     if not request.user.is_authenticated and request.voter_token_is_new:

@@ -21,6 +21,12 @@
 
   --success: #1B7448;  /* --primary-soft zemininde >= 4.5:1 */
   --error:   #B42318;
+  /* Süresi dolan anketin sonuç çubukları: en az oy (kırmızı) -> en çok oy (yeşil). Beyaza >= 3:1. */
+  --rank-0: #C62828;
+  --rank-1: #C2570C;
+  --rank-2: #A16207;
+  --rank-3: #4D7C0F;
+  --rank-4: #15803D;
   --selected: #D4182B;  /* seçili oy seçeneği: beyaza >= 5:1, pastel kartlara >= 4:1 */
   --radius:  16px;
   --shadow:  0 4px 16px rgba(31, 35, 64, 0.08);
@@ -684,3 +690,43 @@ a {
   gap: 0.5rem;
   margin: 1rem 0 0;
 }
+
+/* ---------- Faz 6: süreli anketler ---------- */
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1rem 0 0;
+}
+
+.tabs__link {
+  padding: 0.45rem 1rem;
+  border: 2px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.tabs__link--current {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #FFFFFF;
+  font-weight: 800;
+}
+
+.notice {
+  margin: 0 0 1.25rem;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  background: var(--primary-soft);
+  color: var(--text);
+}
+
+/* Süresi dolan anket: pastel renk yerine yeşil -> kırmızı sıralama (yüzde yazıyla da verilir). */
+.rank-0 .result__fill { background: var(--rank-0); }
+.rank-1 .result__fill { background: var(--rank-1); }
+.rank-2 .result__fill { background: var(--rank-2); }
+.rank-3 .result__fill { background: var(--rank-3); }
+.rank-4 .result__fill { background: var(--rank-4); }
