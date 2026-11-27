@@ -12,11 +12,11 @@ class OptionInline(admin.TabularInline):
 
 @admin.register(Poll)
 class PollAdmin(admin.ModelAdmin):
-    list_display = ("question", "author", "public_id", "created_at")
+    list_display = ("question", "author", "public_id", "created_at", "ends_at")
     list_select_related = ("author",)
     search_fields = ("question", "public_id", "author__username")
     readonly_fields = ("public_id", "created_at")
-    fields = ("public_id", "author", "question", "created_at")
+    fields = ("public_id", "author", "question", "created_at", "ends_at")
     inlines = [OptionInline]
 
 

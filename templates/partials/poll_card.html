@@ -5,6 +5,9 @@
     <span>{{ poll.created_at|since }}</span>
     <span>{{ poll.option_count }} seçenek</span>
     <span>{{ poll.vote_count }} oy</span>
+    {% if poll.ends_at %}
+      {% if poll.is_closed %}<span>🔒 Süresi doldu</span>{% else %}<span>⏳ {{ poll.ends_at|remaining }}</span>{% endif %}
+    {% endif %}
   </p>
-  <a class="btn btn--soft" href="{{ poll.get_absolute_url }}">Oy ver →</a>
+  <a class="btn btn--soft" href="{{ poll.get_absolute_url }}">{% if poll.is_closed %}Sonuçlara bak →{% else %}Oy ver →{% endif %}</a>
 </article>

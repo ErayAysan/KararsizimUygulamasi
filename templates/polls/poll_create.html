@@ -37,6 +37,10 @@
       <button type="button" class="btn btn--soft" data-add-option hidden>➕ Seçenek ekle</button>
     </fieldset>
 
+    {% with field=form.duration %}
+      {% include "partials/form_field.html" %}
+    {% endwith %}
+
     <button type="submit" class="btn btn--primary btn--block">Anketi yayınla</button>
   </form>
 </section>

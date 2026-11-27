@@ -10,12 +10,25 @@
   <p class="poll-meta">
     <span>@{{ poll.author.username }}</span>
     <time datetime="{{ poll.created_at|date:'c' }}">{{ poll.created_at|since }}</time>
+    {% if poll.ends_at %}
+      {% if is_closed %}
+      <span class="status status--closed">🔒 Süresi doldu</span>
+      {% else %}
+      <span class="status status--open">⏳ <time datetime="{{ poll.ends_at|date:'c' }}">{{ poll.ends_at|remaining }}</time></span>
+      {% endif %}
+    {% endif %}
   </p>
+
+  {% if is_closed %}
+  <p class="notice" role="status">Bu anketin süresi <strong>{{ poll.ends_at|date:"j F Y H:i" }}</strong> tarihinde doldu. Oylama kapandı; sonuçlar herkese açık.</p>
+  {% elif poll.ends_at %}
+  <p class="muted">Oylama {{ poll.ends_at|date:"j F Y H:i" }} tarihine kadar açık.</p>
+  {% endif %}
 
   {% if show_results %}
   <ol class="results" aria-label="Sonuçlar">
     {% for option in options %}
-    <li class="result opt-{{ forloop.counter }}">
+    <li class="result opt-{{ forloop.counter }}{% if option.rank is not None %} rank-{{ option.rank }}{% endif %}">
       <div class="result__head">
         <span class="result__text">{{ option.text }}</span>
         <span class="result__badges">
@@ -50,7 +63,7 @@
   </form>
   {% endif %}
 
-  {% if not can_vote %}
+  {% if not can_vote and not is_closed %}
   <p class="muted">Oyunu verdin, teşekkürler! 🙌</p>
   {% endif %}
 
