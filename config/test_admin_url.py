@@ -17,7 +17,9 @@ class AdminUrlTests(TestCase):
     def tearDown(self):
         reload_urls()  # sonraki testler varsayılan adresi görsün
 
+    @override_settings(ROOT_URLCONF="config.urls", ADMIN_URL="admin/")
     def test_default_admin_url_is_admin(self):
+        reload_urls()
         response = self.client.get("/admin/login/")
         self.assertEqual(response.status_code, 200)
 
