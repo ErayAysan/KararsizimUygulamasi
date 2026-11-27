@@ -21,15 +21,21 @@ def _voter(request):
 
 
 def poll_list(request):
-    # İki sekme: "aktif" (süresi devam eden ve süresiz) ve "bitti" (süresi dolan).
-    status = "bitti" if request.GET.get("durum") == "bitti" else "aktif"
+    # Üç sekme: "aktif" (süresi devam eden ve süresiz), "populer" (aktifler, çok oydan aza), "bitti" (süresi dolan).
+    status = request.GET.get("durum")
+    if status not in ("populer", "bitti"):
+        status = "aktif"
     polls = Poll.objects.closed() if status == "bitti" else Poll.objects.active()
     polls = (
         polls.select_related("author")
         # İki ayrı ilişki aynı sorguda sayıldığı için distinct şart (aksi hâlde çarpılırlar).
         .annotate(option_count=Count("options", distinct=True), vote_count=Count("votes", distinct=True))
-        .order_by("-ends_at" if status == "bitti" else "-created_at")
     )
+    if status == "populer":
+        # Hiç oy almamış anket "popüler" sayılmaz; eşit oyda yeni olan üstte.
+        polls = polls.filter(vote_count__gt=0).order_by("-vote_count", "-created_at")
+    else:
+        polls = polls.order_by("-ends_at" if status == "bitti" else "-created_at")
     page = Paginator(polls, POLLS_PER_PAGE).get_page(request.GET.get("page"))
     return render(request, "polls/poll_list.html", {"page": page, "status": status})
 
