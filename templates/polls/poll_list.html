@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{% if status == 'bitti' %}Süresi dolan anketler · Kararsızım{% elif page.number > 1 %}Anketler · Sayfa {{ page.number }} · Kararsızım{% else %}Kararsızım 🤔 · Kararsız kaldığın konuda danış{% endif %}{% endblock %}
+{% block title %}{% if status == 'bitti' %}Süresi dolan anketler · Kararsızım{% elif status == 'populer' %}Popüler anketler · Kararsızım{% elif page.number > 1 %}Anketler · Sayfa {{ page.number }} · Kararsızım{% else %}Kararsızım 🤔 · Kararsız kaldığın konuda danış{% endif %}{% endblock %}
 {% block meta_description %}Kararsız kaldığın konuda diğer kullanıcılara danış. Anketlere üye olmadan oy ver, anket açmak için üye ol.{% endblock %}
 
 {% block content %}
@@ -11,6 +11,7 @@
 
 <nav class="tabs" aria-label="Anket durumu">
   <a class="tabs__link{% if status == 'aktif' %} tabs__link--current{% endif %}" href="{% url 'polls:list' %}"{% if status == 'aktif' %} aria-current="page"{% endif %}>Aktif anketler</a>
+  <a class="tabs__link{% if status == 'populer' %} tabs__link--current{% endif %}" href="{% url 'polls:list' %}?durum=populer"{% if status == 'populer' %} aria-current="page"{% endif %}><span aria-hidden="true">🔥</span> Popüler</a>
   <a class="tabs__link{% if status == 'bitti' %} tabs__link--current{% endif %}" href="{% url 'polls:list' %}?durum=bitti"{% if status == 'bitti' %} aria-current="page"{% endif %}>Süresi dolanlar</a>
 </nav>
 
@@ -24,18 +25,24 @@
   {% if page.has_other_pages %}
   <nav class="pagination" aria-label="Sayfalar">
     {% if page.has_previous %}
-      <a class="btn btn--soft" href="?{% if status == 'bitti' %}durum=bitti&amp;{% endif %}page={{ page.previous_page_number }}" rel="prev">← Yeni</a>
+      <a class="btn btn--soft" href="?{% if status != 'aktif' %}durum={{ status }}&amp;{% endif %}page={{ page.previous_page_number }}" rel="prev">← Önceki</a>
     {% else %}
-      <span class="btn btn--soft btn--disabled" aria-disabled="true">← Yeni</span>
+      <span class="btn btn--soft btn--disabled" aria-disabled="true">← Önceki</span>
     {% endif %}
     <span class="pagination__info" aria-current="page">Sayfa {{ page.number }} / {{ page.paginator.num_pages }}</span>
     {% if page.has_next %}
-      <a class="btn btn--soft" href="?{% if status == 'bitti' %}durum=bitti&amp;{% endif %}page={{ page.next_page_number }}" rel="next">Eski →</a>
+      <a class="btn btn--soft" href="?{% if status != 'aktif' %}durum={{ status }}&amp;{% endif %}page={{ page.next_page_number }}" rel="next">Sonraki →</a>
     {% else %}
-      <span class="btn btn--soft btn--disabled" aria-disabled="true">Eski →</span>
+      <span class="btn btn--soft btn--disabled" aria-disabled="true">Sonraki →</span>
     {% endif %}
   </nav>
   {% endif %}
+{% elif status == 'populer' %}
+  <section class="card empty-state">
+    <p class="empty-state__emoji" aria-hidden="true">🔥</p>
+    <h2>Henüz popüler anket yok</h2>
+    <p class="muted">Oy alan anketler, en çok oy alandan başlayarak burada görünür.</p>
+  </section>
 {% elif status == 'bitti' %}
   <section class="card empty-state">
     <p class="empty-state__emoji" aria-hidden="true">⏳</p>
