@@ -1,10 +1,16 @@
 {% load poll_extras %}<article class="card poll-card">
-  <h2 class="poll-card__question"><a href="{{ poll.get_absolute_url }}">{{ poll.question }}</a></h2>
+  <div class="poll-head">
+    <h2 class="poll-card__question"><a href="{{ poll.get_absolute_url }}">{{ poll.question }}</a></h2>
+    {% if user.is_authenticated and user.id == poll.author_id %}
+    <a class="icon-link icon-link--danger" href="{% url 'polls:delete' poll.public_id %}" title="Anketi sil"><span aria-hidden="true">🗑️</span><span class="visually-hidden">Anketi sil: {{ poll.question }}</span></a>
+    {% endif %}
+  </div>
   <p class="poll-meta">
     <span>@{{ poll.author.username }}</span>
     <span>{{ poll.created_at|since }}</span>
     <span>{{ poll.option_count }} seçenek</span>
     <span>{{ poll.vote_count }} oy</span>
+    {% if poll.allow_vote_change %}<span><span aria-hidden="true">🔄</span> Oy değiştirilebilir</span>{% endif %}
     {% if poll.ends_at %}
       {% if poll.is_closed %}<span><span aria-hidden="true">🔒</span> Süresi doldu</span>{% else %}<span><span aria-hidden="true">⏳</span> {{ poll.ends_at|remaining }}</span>{% endif %}
     {% endif %}

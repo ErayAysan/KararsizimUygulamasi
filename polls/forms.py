@@ -47,6 +47,15 @@ class PollForm(forms.Form):
         error_messages={"invalid_choice": "Geçerli bir süre seç."},
     )
 
+    vote_change = forms.ChoiceField(
+        label="Oy değiştirme",
+        choices=[("0", "Hayır"), ("1", "Evet")],
+        initial="0",
+        required=False,
+        widget=forms.RadioSelect,
+        error_messages={"invalid_choice": "Geçerli bir seçenek seç."},
+    )
+
     def __init__(self, data=None, *args, **kwargs):
         kwargs.setdefault("label_suffix", "")
         super().__init__(data, *args, **kwargs)
@@ -93,7 +102,12 @@ class PollForm(forms.Form):
         with transaction.atomic():
             hours = int(self.cleaned_data.get("duration") or 0)
             ends_at = timezone.now() + timedelta(hours=hours) if hours else None
-            poll = Poll.objects.create(author=author, question=self.cleaned_data["question"], ends_at=ends_at)
+            poll = Poll.objects.create(
+                author=author,
+                question=self.cleaned_data["question"],
+                ends_at=ends_at,
+                allow_vote_change=self.cleaned_data.get("vote_change") == "1",
+            )
             Option.objects.bulk_create(
                 [Option(poll=poll, text=text, order=index) for index, text in enumerate(self.cleaned_options)]
             )
