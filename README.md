@@ -43,3 +43,7 @@ python manage.py test
 GitHub'a push edilen `main` dalı Vercel'de production'a, diğer dallar preview'a deploy edilir.
 Vercel ortam değişkenleri: `DJANGO_SECRET_KEY`, `DJANGO_DEBUG=False`, `DJANGO_ALLOWED_HOSTS`,
 `CSRF_TRUSTED_ORIGINS`, `DATABASE_URL` (transaction pooler, port 6543).
+
+## Lisans
+
+[MIT](LICENSE)
